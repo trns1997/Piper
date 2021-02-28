@@ -38,6 +38,8 @@ namespace piper
         QString name() const;
         QString const& nodeType() const { return type_;  }
 
+        void updateBoundingRectWidth();
+        void updateBoundingRectWidth(qint32 attributeWidth);
         void setMode(Mode mode);
         void setName(QString const& name);
         void setBackgroundColor(QColor const& color)

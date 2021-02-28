@@ -1,4 +1,5 @@
 #include "AttributeMember.h"
+#include "Node.h"
 
 #include <QDebug>
 #include <QLineEdit>
@@ -11,6 +12,7 @@ namespace piper
         , data_{data}
         , bounding_rect_{boundingRect}
         , brush_{brush}
+        , formRect_{boundingRect}
     {
 
     }
@@ -38,6 +40,20 @@ namespace piper
     void MemberForm::onDataUpdated(QVariant const& data)
     {
         data_ = data;
+
+        qint32 width = 9*data.toString().size();
+        AttributeMember * member = qgraphicsitem_cast<AttributeMember *>(parentItem());
+        Node * node = qgraphicsitem_cast<Node *>(parentItem()->parentItem());
+
+        if(width > formRect_.width())
+        {
+            member->setRectWidth(member->labelRect().width()+width+18);
+
+            bounding_rect_.setWidth(width);
+            resize(width, bounding_rect_.height());
+        
+            node->updateBoundingRectWidth(member->boundingRect().width());
+        }
     }
 
 
@@ -46,10 +62,13 @@ namespace piper
     {
         // Reduce the label area to add the form.
         label_rect_ = QRectF{bounding_rect_.left() + 15, bounding_rect_.top(),
-                            bounding_rect_.width() / 3, bounding_rect_.height()};
+                            10.0*name().size(), bounding_rect_.height()};
 
         // Construct the form (area, background color, widget, widgets options etc).
         QRectF formRect{0, 0, bounding_rect_.width() * 2 / 3 - 20, bounding_rect_.height() - 10};
+        
+        setRectWidth(10.0*name().size() + bounding_rect_.width() * 2 / 3);
+
         QBrush brush {{180, 180, 180, 255}, Qt::SolidPattern};
         form_ = new MemberForm(this, data_, formRect, brush);
 
@@ -57,7 +76,6 @@ namespace piper
         if (widget != nullptr)
         {
             widget->setFont(normal_font_);
-            widget->setMaximumSize(formRect.width(), formRect.height());
             widget->resize(formRect.width(), formRect.height());
 
             QFile File(":/style.qss");
@@ -66,7 +84,7 @@ namespace piper
             widget->setStyleSheet(StyleSheet);
             form_->setWidget(widget);
         }
-        form_->setPos(label_rect_.right(), label_rect_.top() + 5);
+        form_->setPos(bounding_rect_.right() - formRect.width() - 5, label_rect_.top() + 5);
     }
 
     void AttributeMember::setData(QVariant const& data)

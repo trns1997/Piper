@@ -35,6 +35,7 @@ namespace piper
         QVariant& data_; // reference on attribute's data
         QRectF bounding_rect_;
         QBrush brush_;
+        QRectF formRect_;
     };
 
     ///\brief A Node attribute that can be edited by the user.

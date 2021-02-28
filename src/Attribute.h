@@ -63,12 +63,15 @@ namespace piper
 
         void setMode(DisplayMode mode)  { mode_ = mode; }
 
+        QRectF boundingRect() const override { return bounding_rect_; }
+        QRectF labelRect() const { return label_rect_; }
+        virtual void setRectWidth(qint32 width);
+
         // Enable the use of qgraphicsitem_cast with this item.
         enum { Type = UserType + 1 };
         int type() const override { return Type; }
 
     protected:
-        QRectF boundingRect() const override { return bounding_rect_; }
         void paint(QPainter* painter, QStyleOptionGraphicsItem const*, QWidget*) override;
 
         void applyFontStyle(QPainter* painter, DisplayMode mode);
@@ -111,6 +114,7 @@ namespace piper
         void setColor(QColor const& color) override;
         void setData(QVariant const& data) override;
         QPointF connectorPos() const override { return mapToScene(connectorPos_); }
+        void setRectWidth(qint32 width) override;
 
     protected:
         void paint(QPainter* painter, QStyleOptionGraphicsItem const*, QWidget*) override;
@@ -118,9 +122,9 @@ namespace piper
         void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
         void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
 
-        QRectF connector_rect_left_;
-        QRectF connector_rect_right_;
-        QRectF* connectorRect_;
+        QPointF output_connector_left_;
+        QPointF output_connector_right_;
+        QPointF* output_connector_;
         QPointF connectorPos_;
 
         Link* new_connection_{nullptr};
@@ -136,6 +140,7 @@ namespace piper
         void setData(QVariant const& data) override;
         bool accept(Attribute* attribute) const override;
         QPointF connectorPos() const override { return mapToScene(connectorPos_); }
+        void setRectWidth(qint32 width) override;
 
     protected:
         void paint(QPainter* painter, QStyleOptionGraphicsItem const*, QWidget*) override;

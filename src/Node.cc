@@ -180,6 +180,8 @@ namespace piper
 
         prepareGeometryChange();
         name_->adjustPosition(); // readjust name position.
+
+        updateBoundingRectWidth();
     }
 
 
@@ -250,6 +252,42 @@ namespace piper
         painter->setFont(type_font_);
         painter->setPen(type_pen_);
         painter->drawText(type_rect_, Qt::AlignCenter, type_);
+    }
+
+
+    void Node::updateBoundingRectWidth()
+    {
+        for (auto& attribute : attributes_)
+        {
+            qint32 attributeWidth = attribute->boundingRect().width();
+            if(attributeWidth > width_)
+            {
+                width_ = attributeWidth;
+                type_rect_.setWidth(width_ - 2);
+                bounding_rect_.setWidth(width_);
+            }
+        }
+        for (auto& attribute : attributes_)
+        {
+            attribute->setRectWidth(width_);
+        }
+
+        name_->adjustPosition();
+    }
+
+
+    void Node::updateBoundingRectWidth(qint32 attributeWidth)
+    {
+        width_ = attributeWidth;
+        type_rect_.setWidth(width_ - 2);
+        bounding_rect_.setWidth(width_);
+        
+        for (auto& attribute : attributes_)
+        {
+            attribute->setRectWidth(width_);
+        }
+
+        name_->adjustPosition();
     }
 
 

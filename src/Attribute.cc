@@ -171,28 +171,30 @@ namespace piper
     }
 
 
+     void Attribute::setRectWidth(qint32 width)
+     {
+        bounding_rect_.setWidth(width);
+        background_rect_.setWidth(width - 2);
+     }
+
+
 
     AttributeOutput::AttributeOutput(QGraphicsItem* parent, AttributeInfo const& info, QRect const& boundingRect)
         : Attribute (parent, info, boundingRect)
     {
 
-        // Compute connector rectangle.
-        qreal const length = bounding_rect_.height() / 4.0;
+        data_ = false; // Use data member to store connector position.
 
-        connector_rect_left_  = QRectF{ bounding_rect_.left() - length - 1, length,
-                                      length * 2, length * 2 };
+        // Compute input inputTriangle_
+        qreal length = bounding_rect_.height() / 4.0;
+        output_connector_left_ = QPointF(bounding_rect_.left() - 1, length * 2);
 
-        connector_rect_right_ = QRectF{ bounding_rect_.right() - length + 1, length,
-                                      length * 2, length * 2 };
+        output_connector_right_ = QPointF(bounding_rect_.right() + 1, length * 2);
 
-         // Use data member to store connector position.
-        setData(false);
-
-        // Update bounding rect to include connector positions
-        bounding_rect_ = bounding_rect_.united(connector_rect_left_);
-        bounding_rect_ = bounding_rect_.united(connector_rect_right_);
-        bounding_rect_ += QMargins(20, 0, 20, 0);
+        bounding_rect_ += QMargins(2, 0, 2, 0);
         prepareGeometryChange();
+
+        setData(false);
     }
 
 
@@ -220,17 +222,34 @@ namespace piper
 
         if (data_.toBool())
         {
-            connectorRect_ = &connector_rect_left_;
+            output_connector_ = &output_connector_left_;
         }
         else
         {
-            connectorRect_ = &connector_rect_right_;
+            output_connector_ = &output_connector_right_;
         }
+
         // Compute connector center to position the path.
-        connectorPos_ = { connectorRect_->x() + connectorRect_->width()  / 2.0,
-                          connectorRect_->y() + connectorRect_->height() / 2.0 };
+        qreal x = output_connector_->x();
+        qreal y = output_connector_->y();
+        connectorPos_ = { x, y };
         update();
     }
+
+
+     void AttributeOutput::setRectWidth(qint32 width)
+     {
+        bounding_rect_.setWidth(width);
+        background_rect_.setWidth(width - 2);
+
+        // Compute input inputTriangle_
+        qreal length = bounding_rect_.height() / 4.0;
+        output_connector_left_ = QPointF(bounding_rect_.left() - 1, length * 2);
+
+        output_connector_right_ = QPointF(bounding_rect_.right() + 1, length * 2);
+
+        setData(data_);
+     }
 
 
     void AttributeOutput::paint(QPainter* painter, QStyleOptionGraphicsItem const*, QWidget*)
@@ -239,15 +258,14 @@ namespace piper
         Attribute::paint(painter, nullptr, nullptr);
 
         applyStyle(painter, mode_);
-        painter->drawEllipse(*connectorRect_);
+        painter->drawEllipse(*output_connector_, 8, 8);
     }
 
 
     void AttributeOutput::mousePressEvent(QGraphicsSceneMouseEvent* event)
     {
         Scene* pScene = static_cast<Scene*>(scene());
-
-        if (connectorRect_->contains(event->pos()) and event->button() == Qt::LeftButton)
+        if ((event->pos() - *output_connector_).manhattanLength() < 10 and event->button() == Qt::LeftButton)
         {
             new_connection_ = new Link();
             new_connection_->connectFrom(this);
@@ -391,6 +409,25 @@ namespace piper
         }
 
         return true;
+    }
+
+
+    void AttributeInput::setRectWidth(qint32 width)
+    {
+        bounding_rect_.setWidth(width);
+        background_rect_.setWidth(width - 2);
+
+        // Compute input inputTriangle_
+        qreal length = bounding_rect_.height() / 4.0;
+        input_triangle_left_[0] = QPointF(bounding_rect_.left() - 1, length);
+        input_triangle_left_[1] = QPointF(bounding_rect_.left() + length * 1.5, length * 2);
+        input_triangle_left_[2] = QPointF(bounding_rect_.left() - 1, length * 3);
+
+        input_triangle_right_[0] = QPointF(bounding_rect_.right() + 1, length);
+        input_triangle_right_[1] = QPointF(bounding_rect_.right() - length * 1.5, length * 2);
+        input_triangle_right_[2] = QPointF(bounding_rect_.right() + 1, length * 3);
+
+        setData(data_);
     }
 
 

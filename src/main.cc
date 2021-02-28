@@ -117,6 +117,19 @@ int main(int argc, char *argv[])
         }
     });
 
+    NodeCreator::instance().addItem(
+    {
+        "TestNode",
+        "Used to test adaptive attribute string member forms",
+        "",
+        "test",
+        {
+            {"input", "float", AttributeInfo::Type::input},
+            {"output", "float", AttributeInfo::Type::output},
+            {"long_test_label", "string", AttributeInfo::Type::member},
+        }
+    });
+
     // Load theme
     if (not ThemeManager::instance().load("data/theme.json"))
     {
