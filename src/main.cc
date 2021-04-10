@@ -127,6 +127,7 @@ int main(int argc, char *argv[])
             {"input", "float", AttributeInfo::Type::input},
             {"output", "float", AttributeInfo::Type::output},
             {"long_test_label", "string", AttributeInfo::Type::member},
+            {"label", "string", AttributeInfo::Type::member},
         }
     });
 

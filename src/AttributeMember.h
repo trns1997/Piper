@@ -18,6 +18,8 @@ namespace piper
         MemberForm(QGraphicsItem* parent, QVariant& data, QRectF const& boundingRect, QBrush const& brush);
         virtual ~MemberForm() = default;
 
+        QRectF boundingRect() const override { return bounding_rect_; }
+
     signals:
         void dataUpdated(int);
         void dataUpdated(double);
@@ -29,7 +31,6 @@ namespace piper
     protected:
         void paint(QPainter* painter, QStyleOptionGraphicsItem const*, QWidget*) override;
         void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
-        QRectF boundingRect() const override { return bounding_rect_; }
 
     private:
         QVariant& data_; // reference on attribute's data
@@ -47,6 +48,8 @@ namespace piper
 
         // Set the data by working closely with the MemberForm class.
         void setData(QVariant const& data) override;
+
+        QRectF getMemberFormRect() override;
 
     private:
         QWidget* createWidget();

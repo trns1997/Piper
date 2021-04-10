@@ -66,6 +66,7 @@ namespace piper
         QRectF boundingRect() const override { return bounding_rect_; }
         QRectF labelRect() const { return label_rect_; }
         virtual void setRectWidth(qint32 width);
+        virtual QRectF getMemberFormRect() { return QRectF{}; }
 
         // Enable the use of qgraphicsitem_cast with this item.
         enum { Type = UserType + 1 };

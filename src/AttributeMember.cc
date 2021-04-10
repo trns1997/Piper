@@ -45,14 +45,29 @@ namespace piper
         AttributeMember * member = qgraphicsitem_cast<AttributeMember *>(parentItem());
         Node * node = qgraphicsitem_cast<Node *>(parentItem()->parentItem());
 
+        qint32 largestMemberFormWidth = 0;
+
         if(width > formRect_.width())
         {
             member->setRectWidth(member->labelRect().width()+width+18);
 
             bounding_rect_.setWidth(width);
             resize(width, bounding_rect_.height());
-        
-            node->updateBoundingRectWidth(member->boundingRect().width());
+
+            for (auto& attribute : node->attributes())
+            {
+                if(attribute->isMember() and largestMemberFormWidth < attribute->boundingRect().width())
+                {
+                    largestMemberFormWidth = attribute->boundingRect().width();
+
+                    printf("%f, %f\n", member->boundingRect().width(), attribute->boundingRect().width());
+                }
+            }
+
+            if(member->boundingRect().width() >= largestMemberFormWidth)
+            {
+                node->updateBoundingRectWidth(member->boundingRect().width());
+            }
         }
     }
 
@@ -110,6 +125,11 @@ namespace piper
                 qDebug() << "Incompatible type: " << data << ". Do nothing";
             }
         }
+    }
+
+    QRectF AttributeMember::getMemberFormRect()
+    {
+        return form_->boundingRect();
     }
 
     QWidget* AttributeMember::createWidget()
